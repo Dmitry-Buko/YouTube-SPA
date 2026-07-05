@@ -1,0 +1,109 @@
+.video-card {
+  display: flex;
+  gap: 12px;
+  padding: 8px 0;
+  border-radius: 8px;
+  transition: background 0.2s;
+}
+
+.video-card:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+/* ==================== GRID ==================== */
+.video-card--grid {
+  flex-direction: column;
+  width: 100%;
+  max-width: 280px;
+}
+
+.video-card--grid .video-card__thumbnail-wrapper {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+
+/* ==================== LIST ==================== */
+.video-card--list {
+  flex-direction: row;
+}
+
+.video-card--list .video-card__thumbnail-wrapper {
+  position: relative;
+  width: 320px;
+  flex-shrink: 0;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+/* Общие стили превью */
+.video-card__thumbnail {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.video-card__duration {
+  position: absolute;
+  bottom: 6px;
+  right: 6px;
+  background-color: rgba(0, 0, 0, 0.85);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 500;
+  padding: 2px 5px;
+  border-radius: 3px;
+  line-height: 1;
+  z-index: 2;
+}
+
+/* Информация */
+.video-card__info {
+  flex: 1;
+  min-width: 0; /* для корректного truncate */
+}
+
+.video-card__title {
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.35;
+  margin: 0 0 6px 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  color: #fff;
+}
+
+.video-card__meta {
+  margin-top: 4px;
+}
+
+.video-card__channel {
+  font-size: 13px;
+  color: #aaaaaa;
+  display: block;
+  margin-bottom: 3px;
+}
+
+.video-card__stats {
+  font-size: 13px;
+  color: #aaaaaa;
+}
+
+.video-card__dot {
+  margin: 0 4px;
+}
+
+.video-card__description {
+  font-size: 13px;
+  color: #aaaaaa;
+  margin-top: 8px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}

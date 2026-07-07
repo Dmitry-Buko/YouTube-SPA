@@ -33,7 +33,7 @@ const Login = () => {
   return (
     <div className="login">
       <div className="login__container">
-        <h1 className="login__title">Вход в ToDo</h1>
+        <h1 className="login__title">Вход в YouTube SPA</h1>
 
         {error && <div className="error-message">{error}</div>}
         {success && <div className="success-message">{success}</div>}

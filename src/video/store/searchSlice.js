@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import axios from "axios";
 import { mapYouTubeVideo } from "../../features/units/mapYouTubeVideo";
+import youtubeApi from "../../features/youtubeApi";
 
 const initialState = {
   searchQuery: "", //поисковый запрос
@@ -14,19 +14,32 @@ export const searchVideos = createAsyncThunk(
   "search/searchVideos",
   async (_, thunkAPI) => {
     const q = thunkAPI.getState().search.searchQuery;
-    const url = "https://www.googleapis.com/youtube/v3/search";
+    const { order, maxResults = 12 } = thunkAPI.getState().savedQueries;
+    if (!q) return [];
     try {
-      const response = await axios.get(url, {
+      const response = await youtubeApi.get("/search", {
         params: {
           part: "snippet",
-          maxResults: 12,
+          maxResults: maxResults,
+          order: order,
           q: q,
           regionCode: "ru",
           type: "video",
-          key: import.meta.env.VITE_YOUTUBE_API_KEY,
         },
       });
-      return response.data.items;
+      const items = response.data.items;
+      const videosId = items
+        .map((item) => item.id?.videoId)
+        .filter(Boolean)
+        .join(",");
+
+      const detailsResponse = await youtubeApi.get("/videos", {
+        params: {
+          part: "snippet,contentDetails,statistics",
+          id: videosId,
+        },
+      });
+      return detailsResponse.data.items;
     } catch (error) {
       return thunkAPI.rejectWithValue(
         error.response?.data?.error?.message ||
@@ -39,15 +52,13 @@ export const searchVideos = createAsyncThunk(
 export const fetchPopularVideos = createAsyncThunk(
   "search/fetchPopularVideos",
   async (_, thunkAPI) => {
-    const url = "https://www.googleapis.com/youtube/v3/videos";
     try {
-      const response = await axios.get(url, {
+      const response = await youtubeApi.get("/videos", {
         params: {
           part: "snippet,contentDetails,statistics",
           chart: "mostPopular",
           maxResults: 20,
           regionCode: "ru",
-          key: import.meta.env.VITE_YOUTUBE_API_KEY,
         },
       });
       return response.data.items;
@@ -73,11 +84,11 @@ const searchSlice = createSlice({
       //searchVideos
       .addCase(searchVideos.pending, (state) => {
         state.loading = true;
-        state.error = "";
+        state.error = null;
       })
       .addCase(searchVideos.fulfilled, (state, action) => {
         state.loading = false;
-        state.error = "";
+        state.error = null;
         state.searchResults = action.payload.map(mapYouTubeVideo);
       })
       .addCase(searchVideos.rejected, (state, action) => {
@@ -87,11 +98,11 @@ const searchSlice = createSlice({
       //fetchPopularVideos
       .addCase(fetchPopularVideos.pending, (state) => {
         state.loading = true;
-        state.error = "";
+        state.error = null;
       })
       .addCase(fetchPopularVideos.fulfilled, (state, action) => {
         state.loading = false;
-        state.error = "";
+        state.error = null;
         state.searchResults = action.payload.map(mapYouTubeVideo);
       })
       .addCase(fetchPopularVideos.rejected, (state, action) => {

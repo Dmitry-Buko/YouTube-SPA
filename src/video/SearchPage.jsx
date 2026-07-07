@@ -6,29 +6,40 @@ import {
   fetchPopularVideos,
   searchVideos,
 } from "./store/searchSlice";
-import { FaHeart, FaRegHeart } from "react-icons/fa";
-import SaveQueryModal from "../shared/ui/mui_components/SaveQueryModal";
+import { FaRegHeart } from "react-icons/fa"; //+ FaHeart
+// import SaveQueryModal from "../shared/ui/mui_components/SaveQueryModal";
+import { useLocation } from "react-router-dom";
+import { useSaveQueryModal } from "../hooks/useSaveQueryModal";
+
 
 function SearchPage() {
   const [viewType, setViewType] = useState("grid");
   const dispatch = useDispatch();
+  const location = useLocation();
   const { searchQuery, searchResults } = useSelector((store) => store.search);
-  const [openSaveModal, setOpenSaveModal] = useState(false);
-  
+  const {openModal, SaveQueryModalComp } = useSaveQueryModal()
+  //передача запроса от избранного
+  useEffect(() => {
+    const targetText = location.state?.searchTarget;
+    if (targetText) {
+      dispatch(addInputValue(targetText));
+    }
+    dispatch(searchVideos());
+  }, [dispatch, location.state?.searchTarget]);
+
   const fetchVideo = () => {
     dispatch(fetchPopularVideos());
   };
 
-  console.log("searchResults", searchResults); //---------------------
-
-
   const handleSubmit = (e) => {
     e.preventDefault();
-    dispatch(searchVideos(searchQuery));
+    dispatch(searchVideos());
   };
 
   const handleAddToFavorites = () => {
-    setOpenSaveModal(true);
+    openModal({
+      query: searchQuery,
+    });
   };
 
   return (
@@ -51,11 +62,7 @@ function SearchPage() {
               {/* {isFavorite ? <FaHeart color="#ff4d4d" /> : <FaRegHeart />} */}
               <FaRegHeart />
             </button>
-            <SaveQueryModal
-              open={openSaveModal}
-              onClose={() => setOpenSaveModal(false)}
-              query={searchQuery} // передаём текущий запрос
-            />
+            <SaveQueryModalComp />
             <button type="submit" className="search-btn">
               Найти
             </button>

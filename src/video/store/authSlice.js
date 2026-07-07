@@ -1,5 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
+import { setCurrentUserEmail } from "../../features/units/localStorage";
 
 const initialState = {
   username: "",
@@ -26,6 +27,7 @@ export const newUserRegistration = createAsyncThunk(
       const response = await axios.post(url, formData, config);
       const token = response.data?.access_token;
       localStorage.setItem("token", token);
+      setCurrentUserEmail(formData.email)
     } catch (error) {
       return rejectWithValue(
         error?.response?.data?.errors?.[0]?.msg ||
@@ -52,6 +54,7 @@ export const loginUser = createAsyncThunk(
       const response = await axios.post(url, formData, config);
       const token = response.data.access_token;
       localStorage.setItem("token", token);
+      setCurrentUserEmail(email)
     } catch (error) {
       return thunkApi.rejectWithValue(
         error?.response?.data?.errors?.[0]?.msg ||

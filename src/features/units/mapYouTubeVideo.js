@@ -1,16 +1,20 @@
 // utils/mapYouTubeVideo.js
 export const mapYouTubeVideo = (video) => {
+  const snippet = video.snippet || {};
+  const statistics = video.statistics || {};
+  const contentDetails = video.contentDetails || {};
+
   return {
     id: video.id,
-    title: video.snippet.title,
-    channelTitle: video.snippet.channelTitle,
-    description: video.snippet.description,
-    thumbnailUrl: video.snippet.thumbnails.medium?.url || 
-                  video.snippet.thumbnails.high?.url || 
-                  video.snippet.thumbnails.default?.url,
-    viewCount: parseInt(video.statistics?.viewCount || 0),
-    publishedAt: formatPublishedDate(video.snippet.publishedAt),
-    duration: formatDuration(video.contentDetails?.duration),
+    title: snippet.title,
+    channelTitle: snippet.channelTitle,
+    description: snippet.description || "",
+    thumbnailUrl: snippet.thumbnails?.medium?.url || 
+                  snippet.thumbnails?.high?.url || 
+                  snippet.thumbnails?.default?.url,
+    viewCount: parseInt(statistics.viewCount || 0),
+    publishedAt: formatPublishedDate(snippet.publishedAt),
+    duration: formatDuration(contentDetails.duration),
   };
 };
 

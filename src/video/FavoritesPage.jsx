@@ -1,48 +1,84 @@
-import { useSelector, useDispatch } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+import { useSelector, useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import {
+  deleteQuery,
+  loadQueries,
+  updateQuery,
+} from "./store/savedQueriesSlice";
+import { useEffect } from "react";
+import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
+import EditIcon from "@mui/icons-material/Edit";
+import { IconButton } from "@mui/material";
+import { useSaveQueryModal } from "../hooks/useSaveQueryModal";
 
 function FavoritesPage() {
-  // const navigate = useNavigate();
-  // const dispatch = useDispatch();
-  
-  // Получаем массив элементов из Redux Store
-  // const favorites = useSelector((state) => state.favorites.items);
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const {openModal, SaveQueryModalComp } = useSaveQueryModal()
+  const favorites = useSelector((state) => state.savedQueries.queries);
 
-  // const handleItemClick = (text) => {
-  //   // Передаем текст запроса обратно на страницу поиска
-  //   navigate('/search', { state: { searchTarget: text } });
-  // };
+  useEffect(() => {
+    dispatch(loadQueries());
+  }, [dispatch]);
 
-  // const handleDelete = (id, e) => {
-  //   e.stopPropagation(); // Стопаем всплытие, чтобы не сработал клик по строке
-  //   dispatch(removeFavorite(id)); // Удаляем из Redux
-  // };
+  const handleItemClick = (text) => {
+    navigate("/search", { state: { searchTarget: text } });
+  };
+
+  const handleDelete = (id, e) => {
+    e.stopPropagation();
+    dispatch(deleteQuery(id));
+  };
+
+  const handleEdit = (item, e) => {
+    e.stopPropagation();
+    openModal({
+      query: item.originalQuery,
+      initialName: item.name,
+      initialSort: item.sortBy,
+      initialMaxResults: item.maxResults,
+      isEdit: true,
+      queryId: item.id,
+    });
+    dispatch(updateQuery(item.id));
+  };
 
   return (
     <div className="favorites-container">
       <h1 className="favorites-title">Избранное</h1>
-      
-      {/* {favorites.length === 0 ? (
+
+      {favorites.length === 0 ? (
         <p className="favorites-empty">У вас пока нет избранных запросов.</p>
       ) : (
         <ul className="favorites-list">
           {favorites.map((item) => (
-            <li 
-              key={item.id} 
+            <li
+              key={item.id}
               className="favorites-item"
-              onClick={() => handleItemClick(item.text)}
+              onClick={() => handleItemClick(item.originalQuery)}
             >
-              <span className="favorites-text">{item.text}</span>
-              <button 
+              <span className="favorites-text">{item.name}</span>
+              <IconButton
+                className="favorites-edit-btn"
+                onClick={(e) => handleEdit(item.id, e)}
+                color="primary"
+                size="small"
+              >
+                <EditIcon />
+              </IconButton>
+              <IconButton
                 className="favorites-delete-btn"
                 onClick={(e) => handleDelete(item.id, e)}
+                color="error"
+                size="small"
               >
-                &times;
-              </button>
+                <DeleteForeverIcon />
+              </IconButton>
+              <SaveQueryModalComp />
             </li>
           ))}
         </ul>
-      )} */}
+      )}
     </div>
   );
 }

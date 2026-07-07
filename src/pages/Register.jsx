@@ -24,12 +24,7 @@ const Register = () => {
     try {
       await dispatch(newUserRegistration(formData)).unwrap()
       setTimeout(() => {
-        navigate("/login", {
-          state: {
-            email: formData.email,
-            password: formData.password,
-          },
-        });
+        navigate("/login");
       }, 2000);
     } catch (error) {
       console.error("Ошибка при регистрации Register.jsx:", error);

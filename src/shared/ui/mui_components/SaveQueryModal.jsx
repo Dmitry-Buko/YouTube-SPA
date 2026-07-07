@@ -15,12 +15,14 @@ import {
   Stack,
 } from "@mui/material";
 import { useState } from "react";
+import { useDispatch } from "react-redux";
+import { addQuery } from "../../../video/store/savedQueriesSlice";
 
 const SaveQueryModal = ({ open, onClose, query = "" }) => {
   const [name, setName] = useState("");
   const [sortBy, setSortBy] = useState("");
   const [maxResults, setMaxResults] = useState(25);
-
+  const dispatch = useDispatch()
   const handleSave = () => {
     if (!name.trim()) return;
 
@@ -30,10 +32,7 @@ const SaveQueryModal = ({ open, onClose, query = "" }) => {
       sortBy,
       maxResults,
     };
-
-    console.log("Сохранён запрос:", savedQuery);
-    // Здесь можно добавить dispatch в Redux
-
+    dispatch(addQuery(savedQuery))
     onClose();
     // Очистка формы
     setName("");
@@ -51,6 +50,7 @@ const SaveQueryModal = ({ open, onClose, query = "" }) => {
 
       <DialogContent>
         <Stack spacing={3} sx={{ mt: 1 }}>
+
           {/* Запрос (только для отображения) */}
           <Box>
             <Typography variant="body2" color="text.secondary" gutterBottom>
@@ -124,11 +124,6 @@ const SaveQueryModal = ({ open, onClose, query = "" }) => {
                 onChange={(e) => setMaxResults(Number(e.target.value))}
                 size="small"
                 sx={{ width: 80 }}
-                // InputProps={{
-                //   type: "number",
-                //   min: 5,
-                //   max: 50,
-                // }}
                 slotProps={{
                   input: {
                     type: "number",

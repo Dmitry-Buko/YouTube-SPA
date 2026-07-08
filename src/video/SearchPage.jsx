@@ -18,14 +18,18 @@ function SearchPage() {
   const location = useLocation();
   const { searchQuery, searchResults } = useSelector((store) => store.search);
   const {openModal, SaveQueryModalComp } = useSaveQueryModal()
+
   //передача запроса от избранного
   useEffect(() => {
-    const targetText = location.state?.searchTarget;
+    const state = location.state || {};
+    const targetText = state.searchTarget
+    const order = state.order
+    const maxResults = state.maxResults
     if (targetText) {
       dispatch(addInputValue(targetText));
     }
-    dispatch(searchVideos());
-  }, [dispatch, location.state?.searchTarget]);
+    dispatch(searchVideos({ order, maxResults}));
+  }, [dispatch, location.state]);
 
   const fetchVideo = () => {
     dispatch(fetchPopularVideos());

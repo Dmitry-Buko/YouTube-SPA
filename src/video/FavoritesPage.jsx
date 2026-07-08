@@ -14,15 +14,23 @@ import { useSaveQueryModal } from "../hooks/useSaveQueryModal";
 function FavoritesPage() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const {openModal, SaveQueryModalComp } = useSaveQueryModal()
+  const { openModal, SaveQueryModalComp } = useSaveQueryModal();
   const favorites = useSelector((state) => state.savedQueries.queries);
 
   useEffect(() => {
     dispatch(loadQueries());
   }, [dispatch]);
 
-  const handleItemClick = (text) => {
-    navigate("/search", { state: { searchTarget: text } });
+  const handleItemClick = (item) => {
+    console.log("item::", item);
+
+    navigate("/search", {
+      state: { 
+        searchTarget: item.originalQuery, 
+        order: item.sortBy || "",
+        maxResults: item.maxResults || 12,
+      },
+    });
   };
 
   const handleDelete = (id, e) => {
@@ -40,7 +48,7 @@ function FavoritesPage() {
       isEdit: true,
       queryId: item.id,
     });
-    dispatch(updateQuery(item.id));
+    // dispatch(updateQuery(item.id));
   };
 
   return (
@@ -55,12 +63,12 @@ function FavoritesPage() {
             <li
               key={item.id}
               className="favorites-item"
-              onClick={() => handleItemClick(item.originalQuery)}
+              onClick={() => handleItemClick(item)}
             >
               <span className="favorites-text">{item.name}</span>
               <IconButton
                 className="favorites-edit-btn"
-                onClick={(e) => handleEdit(item.id, e)}
+                onClick={(e) => handleEdit(item, e)}
                 color="primary"
                 size="small"
               >

@@ -14,11 +14,7 @@ export const useSaveQueryModal = () => {
   }, []);
 
   const SaveQueryModalComp = () => (
-    <SaveQueryModal
-      open={open}
-      onClose={closeModal}
-      {...modalProps}
-    />
+    <SaveQueryModal open={open} onClose={closeModal} {...modalProps} />
   );
 
   return {

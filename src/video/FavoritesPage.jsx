@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import {
   deleteQuery,
   loadQueries,
-  updateQuery,
 } from "./store/savedQueriesSlice";
 import { useEffect } from "react";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
@@ -22,8 +21,6 @@ function FavoritesPage() {
   }, [dispatch]);
 
   const handleItemClick = (item) => {
-    console.log("item::", item);
-
     navigate("/search", {
       state: { 
         searchTarget: item.originalQuery, 
@@ -48,7 +45,6 @@ function FavoritesPage() {
       isEdit: true,
       queryId: item.id,
     });
-    // dispatch(updateQuery(item.id));
   };
 
   return (

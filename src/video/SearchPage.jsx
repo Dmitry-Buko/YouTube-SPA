@@ -7,7 +7,6 @@ import {
   searchVideos,
 } from "./store/searchSlice";
 import { FaRegHeart } from "react-icons/fa"; //+ FaHeart
-// import SaveQueryModal from "../shared/ui/mui_components/SaveQueryModal";
 import { useLocation } from "react-router-dom";
 import { useSaveQueryModal } from "../hooks/useSaveQueryModal";
 

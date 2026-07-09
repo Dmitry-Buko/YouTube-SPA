@@ -16,54 +16,89 @@ import {
 } from "@mui/material";
 import { useState } from "react";
 import { useDispatch } from "react-redux";
-import { addQuery } from "../../../video/store/savedQueriesSlice";
+import { addQuery, updateQuery } from "../../../video/store/savedQueriesSlice";
 
-const SaveQueryModal = ({ open, onClose, query = "" }) => {
-  const [name, setName] = useState("");
-  const [sortBy, setSortBy] = useState("");
-  const [maxResults, setMaxResults] = useState(25);
-  const dispatch = useDispatch()
+const SaveQueryModal = ({
+  open,
+  onClose,
+  query = "",
+  initialMaxResults = 25,
+  initialName = "",
+  initialSort = "",
+  isEdit = false,
+  queryId,
+}) => {
+  const [name, setName] = useState(initialName);
+  const [sortBy, setSortBy] = useState(initialSort);
+  const [maxResults, setMaxResults] = useState(initialMaxResults);
+  const [originalQuery, setOriginalQuery] = useState(query);
+  const modalKey = isEdit ? `edit-${queryId}` : `new-${query}`;
+
+  const dispatch = useDispatch();
+
   const handleSave = () => {
     if (!name.trim()) return;
-
     const savedQuery = {
-      originalQuery: query,
+      originalQuery: originalQuery.trim(),
       name: name.trim(),
       sortBy,
       maxResults,
     };
-    dispatch(addQuery(savedQuery))
+
+    if (isEdit && queryId) {
+      dispatch(
+        updateQuery({
+          id: queryId,
+          ...savedQuery,
+        }),
+      );
+    } else {
+      dispatch(addQuery(savedQuery));
+    }
+
     onClose();
     // Очистка формы
     setName("");
     setSortBy("");
     setMaxResults(25);
+    setOriginalQuery("");
+  };
+
+  const handleChangeOriginalQuery = (e) => {
+    if (isEdit) setOriginalQuery(e.target.value);
   };
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
+    <Dialog
+      open={open}
+      onClose={onClose}
+      maxWidth="sm"
+      onClick={(e) => e.stopPropagation()}
+      key={modalKey}
+      fullWidth
+    >
       <DialogTitle
         sx={{ textAlign: "center", fontWeight: 600, color: "black" }}
       >
-        Сохранить запрос
+        {isEdit ? "Редактировать запрос" : "Сохранить запрос"}
       </DialogTitle>
 
       <DialogContent>
         <Stack spacing={3} sx={{ mt: 1 }}>
-
-          {/* Запрос (только для отображения) */}
+          {/* Запрос */}
           <Box>
             <Typography variant="body2" color="text.secondary" gutterBottom>
-              Запрос
+              Запрос {isEdit && "(можно изменить)"}
             </Typography>
             <TextField
               fullWidth
-              value={query || ""}
+              value={originalQuery || ""}
               size="small"
               variant="outlined"
+              onChange={(e) => handleChangeOriginalQuery(e)}
               slotProps={{
                 input: {
-                  readOnly: true,
+                  readOnly: !isEdit,
                 },
               }}
             />
@@ -147,7 +182,7 @@ const SaveQueryModal = ({ open, onClose, query = "" }) => {
           disabled={!name.trim()}
           sx={{ borderRadius: 2 }}
         >
-          Сохранить
+          {isEdit ? "Сохранить изменения" : "Сохранить"}
         </Button>
       </DialogActions>
     </Dialog>

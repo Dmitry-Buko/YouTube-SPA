@@ -6,7 +6,7 @@ import {
 } from "../../features/units/localStorage";
 
 const initialState = {
-  queries: [], //originalQuery, name, sortBy, maxResults + id
+  queries: [],
   loading: false,
   error: null,
 };
@@ -35,17 +35,17 @@ const savedQueriesSlice = createSlice({
     },
     updateQuery: (state, action) => {
       const email = getCurrentUserEmail();
-      const index = state.queries.findIndex((q) => q.id === action.payload);
-      if (index !== -1) {
+      const { id, ...newData } = action.payload;
+      const index = state.queries.findIndex((q) => q.id === id);
+      if (index !== -1 && id) {
         state.queries[index] = {
           ...state.queries[index],
-          query: action.payload,
+          ...newData,
         };
+        saveSavedQueries(email, state.queries);
       }
-      saveSavedQueries(email, state.queries);
     },
     deleteQuery: (state, action) => {
-      //принимает id
       const email = getCurrentUserEmail();
       state.queries = state.queries.filter((q) => q.id !== action.payload);
       saveSavedQueries(email, state.queries);

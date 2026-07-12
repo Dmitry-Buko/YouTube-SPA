@@ -12,9 +12,8 @@ const initialState = {
 
 export const searchVideos = createAsyncThunk(
   "search/searchVideos",
-  async ({ order = "", maxResults = 12 } = {}, thunkAPI) => {
-    const q = thunkAPI.getState().search.searchQuery;
-    // const { order = '', maxResults = 12 } = thunkAPI.getState().savedQueries;
+  async ({ order = "relevance", maxResults = 12 } = {}, thunkAPI) => {
+    const q = thunkAPI.getState().search.searchQuery || '';
     if (!q) return [];
     try {
       const response = await youtubeApi.get("/search", {

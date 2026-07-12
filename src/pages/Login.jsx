@@ -1,13 +1,23 @@
 import { Link, useNavigate } from "react-router-dom";
-import InputLogin from "../shared/ui/InputLogin";
 import { useDispatch, useSelector } from "react-redux";
-import { loginUser, setFormData } from "../video/store/authSlice";
+import { loginUser, setFormData } from "../features/auth/authSlice";
+import {
+  Box,
+  TextField,
+  Button,
+  Typography,
+  Alert,
+  Container,
+  InputAdornment,
+} from "@mui/material";
+import EmailIcon from "@mui/icons-material/Email";
+import LockIcon from "@mui/icons-material/Lock";
 
 const Login = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { error, loading, success, email, password } = useSelector(
-    (state) => state.auth,
+    (state) => state.auth
   );
 
   const handleChange = (e) =>
@@ -15,7 +25,7 @@ const Login = () => {
       setFormData({
         name: e.target.name,
         value: e.target.value,
-      }),
+      })
     );
 
   const handleSubmit = async (e) => {
@@ -31,55 +41,125 @@ const Login = () => {
   };
 
   return (
-    <div className="login">
-      <div className="login__container">
-        <h1 className="login__title">Вход в YouTube SPA</h1>
+    <Container maxWidth="sm" sx={{ py: 8 }}>
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          bgcolor: "#1a1a1a",
+          p: 5,
+          borderRadius: 3,
+          boxShadow: "0 8px 32px rgba(0,0,0,0.6)",
+        }}
+      >
+        <Typography 
+          variant="h4" 
+          sx={{ mb: 4, color: "#ffffff", fontWeight: 700 }}
+        >
+          Вход в YouTube SPA
+        </Typography>
 
-        {error && <div className="error-message">{error}</div>}
-        {success && <div className="success-message">{success}</div>}
+        {error && (
+          <Alert severity="error" sx={{ width: "100%", mb: 3 }}>
+            {error}
+          </Alert>
+        )}
 
-        <form onSubmit={handleSubmit} className="login__form">
-          <div className="form-group">
-            <label>E-mail</label>
-            <InputLogin
-              type="text"
-              name="email"
-              value={email}
-              onChange={handleChange}
-              placeholder="Введите e-mail"
-              required
-            />
-          </div>
+        {success && (
+          <Alert severity="success" sx={{ width: "100%", mb: 3 }}>
+            {success}
+          </Alert>
+        )}
 
-          <div className="form-group">
-            <label>Пароль</label>
-            <InputLogin
-              type="password"
-              name="password"
-              value={password}
-              onChange={handleChange}
-              placeholder="Введите пароль"
-              required
-            />
-          </div>
+        <form onSubmit={handleSubmit} style={{ width: "100%" }}>
+          <TextField
+            fullWidth
+            label="E-mail"
+            name="email"
+            type="email"
+            value={email}
+            onChange={handleChange}
+            required
+            sx={{ 
+              mb: 3,
+              "& .MuiInputBase-input": { color: "#e0e0e0" },
+              "& .MuiOutlinedInput-notchedOutline": { borderColor: "#e0e0e0" },
+              "&:hover .MuiOutlinedInput-notchedOutline": { borderColor: "#ffffff" },
+              "& .MuiInputLabel-root": { color: "#e0e0e0" },
+            }}
+            slotProps={{
+              input: {
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <EmailIcon sx={{ color: "#e0e0e0" }} />
+                  </InputAdornment>
+                ),
+              },
+            }}
+          />
 
-          <button
+          <TextField
+            fullWidth
+            label="Пароль"
+            name="password"
+            type="password"
+            value={password}
+            onChange={handleChange}
+            required
+            sx={{ 
+              mb: 4,
+              "& .MuiInputBase-input": { color: "#e0e0e0" },
+              "& .MuiOutlinedInput-notchedOutline": { borderColor: "#e0e0e0" },
+              "&:hover .MuiOutlinedInput-notchedOutline": { borderColor: "#ffffff" },
+              "& .MuiInputLabel-root": { color: "#e0e0e0" },
+            }}
+            slotProps={{
+              input: {
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <LockIcon sx={{ color: "#e0e0e0" }} />
+                  </InputAdornment>
+                ),
+              },
+            }}
+          />
+
+          <Button
             type="submit"
+            fullWidth
+            variant="contained"
+            size="large"
             disabled={loading}
-            className="form-group__btn-enter"
+            sx={{
+              py: 1.5,
+              borderRadius: 2,
+              textTransform: "none",
+              fontSize: "1.1rem",
+              fontWeight: 600,
+              bgcolor: "#3ea6ff",
+              "&:hover": { bgcolor: "#1e90ff" },
+            }}
           >
             {loading ? "Вход..." : "Войти"}
-          </button>
+          </Button>
         </form>
 
-        <p className="switch-link">
-          Нет аккаунта?
-          <Link to="/register" className="switch-link__login">
+        <Typography sx={{ mt: 4, color: "#e0e0e0" }}>
+          Нет аккаунта?{" "}
+          <Link
+            to="/register"
+            style={{ 
+              color: "#58a6ff", 
+              textDecoration: "none", 
+              fontWeight: 500 
+            }}
+          >
             Зарегистрироваться
           </Link>
-        </p>
-      </div>
-    </div>
+        </Typography>
+      </Box>
+    </Container>
   );
 };
 

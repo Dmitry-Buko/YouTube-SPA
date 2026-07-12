@@ -1,13 +1,20 @@
+import React from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import {
-  deleteQuery,
-  loadQueries,
-} from "./store/savedQueriesSlice";
+import { deleteQuery, loadQueries } from "./store/savedQueriesSlice";
 import { useEffect } from "react";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 import EditIcon from "@mui/icons-material/Edit";
-import { IconButton } from "@mui/material";
+import {
+  IconButton,
+  Container,
+  Box,
+  Typography,
+  List,
+  ListItem,
+  ListItemText,
+  Divider,
+} from "@mui/material";
 import { useSaveQueryModal } from "../hooks/useSaveQueryModal";
 
 function FavoritesPage() {
@@ -22,8 +29,8 @@ function FavoritesPage() {
 
   const handleItemClick = (item) => {
     navigate("/search", {
-      state: { 
-        searchTarget: item.originalQuery, 
+      state: {
+        searchTarget: item.originalQuery,
         order: item.sortBy || "",
         maxResults: item.maxResults || 12,
       },
@@ -48,42 +55,73 @@ function FavoritesPage() {
   };
 
   return (
-    <div className="favorites-container">
-      <h1 className="favorites-title">Избранное</h1>
+    <Container maxWidth="md" sx={{ py: 4 }}>
+      <Box sx={{ textAlign: "center", mb: 5 }}>
+        <Typography variant="h3" sx={{ color: "#ffffff", fontWeight: 700 }}>
+          Избранное
+        </Typography>
+      </Box>
 
       {favorites.length === 0 ? (
-        <p className="favorites-empty">У вас пока нет избранных запросов.</p>
+        <Box sx={{ textAlign: "center", py: 8 }}>
+          <Typography variant="h6" sx={{ color: "#e0e0e0", mb: 1 }}>
+            У вас пока нет избранных запросов.
+          </Typography>
+          <Typography variant="body2" sx={{ color: "#888" }}>
+            Сохраняйте поисковые запросы, чтобы они появились здесь
+          </Typography>
+        </Box>
       ) : (
-        <ul className="favorites-list">
-          {favorites.map((item) => (
-            <li
-              key={item.id}
-              className="favorites-item"
-              onClick={() => handleItemClick(item)}
-            >
-              <span className="favorites-text">{item.name}</span>
-              <IconButton
-                className="favorites-edit-btn"
-                onClick={(e) => handleEdit(item, e)}
-                color="primary"
-                size="small"
-              >
-                <EditIcon />
-              </IconButton>
-              <IconButton
-                className="favorites-delete-btn"
-                onClick={(e) => handleDelete(item.id, e)}
-                color="error"
-                size="small"
-              >
-                <DeleteForeverIcon />
-              </IconButton>
-              <SaveQueryModalComp />
-            </li>
-          ))}
-        </ul>
+        <Box sx={{ bgcolor: "#1a1a1a", borderRadius: 3, p: 2 }}>
+          <List>
+            {favorites.map((item, index) => (
+              <React.Fragment key={item.id}>
+                <ListItem
+                  onClick={() => handleItemClick(item)}
+                  sx={{
+                    borderRadius: 2,
+                    cursor: "pointer",
+                    "&:hover": { bgcolor: "#252525" },
+                    py: 2,
+                  }}
+                >
+                  <ListItemText
+                    primary={item.name}
+                    slotProps={{
+                      primary: {
+                        sx: { color: "#e0e0e0", fontWeight: 500 },
+                      },
+                    }}
+                  />
+
+                  <Box sx={{ display: "flex", gap: 1 }}>
+                    <IconButton
+                      onClick={(e) => handleEdit(item, e)}
+                      color="primary"
+                      size="small"
+                    >
+                      <EditIcon />
+                    </IconButton>
+                    <IconButton
+                      onClick={(e) => handleDelete(item.id, e)}
+                      color="error"
+                      size="small"
+                    >
+                      <DeleteForeverIcon />
+                    </IconButton>
+                  </Box>
+                </ListItem>
+                {index < favorites.length - 1 && (
+                  <Divider sx={{ borderColor: "#333" }} />
+                )}
+              </React.Fragment>
+            ))}
+          </List>
+        </Box>
       )}
-    </div>
+
+      <SaveQueryModalComp />
+    </Container>
   );
 }
 

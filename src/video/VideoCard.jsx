@@ -1,10 +1,8 @@
 import "../shared/styles/VideoCard.css";
 
-function VideoCard({ data, variant = "grid" }) {
-  // Variant может быть либо 'grid', либо 'list'
+function VideoCard({ data, variant = "grid", onClick }) {
   const isList = variant === "list";
 
-  // Форматируем просмотры для красоты (например, 125340 -> "125 тыс. просмотров")
   const formatViews = (views) => {
     if (views >= 1000000)
       return `${(views / 1000000).toFixed(1)} млн. просмотров`;
@@ -12,13 +10,19 @@ function VideoCard({ data, variant = "grid" }) {
     return `${views} просмотров`;
   };
 
+  const handleClick = () => {
+    if (onClick) onClick(data);
+  };
+
   return (
     <div
       className={`video-card ${isList ? "video-card--list" : "video-card--grid"}`}
+      onClick={handleClick}
+      style={{ cursor: onClick ? "pointer" : "default" }}
     >
       <div className="video-card__thumbnail-wrapper">
         <img
-          src={data.thumbnailUrl || "https://placeholder.com"}
+          src={data.thumbnailUrl || "https://via.placeholder.com/320x180?text=No+Image"}
           alt={data.title}
           className="video-card__thumbnail"
         />
@@ -36,7 +40,7 @@ function VideoCard({ data, variant = "grid" }) {
           <span className="video-card__channel">{data.channelTitle}</span>
 
           <div className="video-card__stats">
-            {data.viewCount && data.viewCount > 0 && (
+            {data.viewCount > 0 && (
               <>
                 <span>{formatViews(data.viewCount)}</span>
                 <span className="video-card__dot">•</span>

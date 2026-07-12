@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
-import { setCurrentUserEmail } from "../../features/units/localStorage";
+import { setCurrentUserEmail } from "../units/localStorage";
 
 const initialState = {
   username: "",
@@ -27,7 +27,7 @@ export const newUserRegistration = createAsyncThunk(
       const response = await axios.post(url, formData, config);
       const token = response.data?.access_token;
       localStorage.setItem("token", token);
-      setCurrentUserEmail(formData.email)
+      setCurrentUserEmail(formData.email);
     } catch (error) {
       return rejectWithValue(
         error?.response?.data?.errors?.[0]?.msg ||
@@ -54,7 +54,7 @@ export const loginUser = createAsyncThunk(
       const response = await axios.post(url, formData, config);
       const token = response.data.access_token;
       localStorage.setItem("token", token);
-      setCurrentUserEmail(email)
+      setCurrentUserEmail(email);
     } catch (error) {
       return thunkApi.rejectWithValue(
         error?.response?.data?.errors?.[0]?.msg ||
@@ -64,6 +64,11 @@ export const loginUser = createAsyncThunk(
     }
   },
 );
+
+export const logout = createAsyncThunk("auth/logout", async () => {
+  localStorage.removeItem("token");
+  return;
+});
 
 const authSlice = createSlice({
   name: "auth",
@@ -99,12 +104,12 @@ const authSlice = createSlice({
       })
       .addCase(loginUser.fulfilled, (state) => {
         state.loading = false;
-        state.success = "Все гуда, залетаем!";
+        state.success = "Входим в приложение!";
       })
       .addCase(loginUser.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
-      })
+      });
   },
 });
 

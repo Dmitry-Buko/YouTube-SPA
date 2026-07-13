@@ -3,9 +3,9 @@ import { mapYouTubeVideo } from "../../features/units/mapYouTubeVideo";
 import youtubeApi from "../../features/youtubeApi";
 
 const initialState = {
-  searchQuery: "", //поисковый запрос
-  searchResults: [], //результат поиска
-  nextPageToken: null, //пагинация
+  searchQuery: "",
+  searchResults: [],
+  nextPageToken: null,
   loading: false,
   error: null,
 };
@@ -13,7 +13,7 @@ const initialState = {
 export const searchVideos = createAsyncThunk(
   "search/searchVideos",
   async ({ order = "relevance", maxResults = 12 } = {}, thunkAPI) => {
-    const q = thunkAPI.getState().search.searchQuery || '';
+    const q = thunkAPI.getState().search.searchQuery || "";
     if (!q) return [];
     try {
       const response = await youtubeApi.get("/search", {
@@ -25,6 +25,7 @@ export const searchVideos = createAsyncThunk(
           regionCode: "ru",
           type: "video",
         },
+        signal: thunkAPI.signal,
       });
       const items = response.data.items;
       const videosId = items
@@ -37,9 +38,11 @@ export const searchVideos = createAsyncThunk(
           part: "snippet,contentDetails,statistics",
           id: videosId,
         },
+        signal: thunkAPI.signal,
       });
       return detailsResponse.data.items;
     } catch (error) {
+      if (error.code === "ERR_CANCELED") return [];
       return thunkAPI.rejectWithValue(
         error.response?.data?.error?.message ||
           "Ошибка при загрузке /searchVideos",
@@ -59,9 +62,14 @@ export const fetchPopularVideos = createAsyncThunk(
           maxResults: 20,
           regionCode: "ru",
         },
+        signal: thunkAPI.signal,
       });
       return response.data.items;
     } catch (error) {
+      if (error.code === "ERR_CANCELED") {
+        console.error("Запрос отменен Abort/fetchPopularVideos");
+        return thunkAPI.rejectWithValue("Запрос отменен"); 
+      }
       return thunkAPI.rejectWithValue(
         error.response?.data?.error?.message ||
           "Ошибка при загрузке /fetchPopularVideos",
@@ -77,6 +85,9 @@ const searchSlice = createSlice({
     addInputValue: (state, actions) => {
       state.searchQuery = actions.payload;
     },
+    resetInputToZero: (state)=>{
+      state.searchQuery = ''
+    }
   },
   extraReducers: (builder) => {
     builder
@@ -92,7 +103,9 @@ const searchSlice = createSlice({
       })
       .addCase(searchVideos.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload;
+        if (action.error.name !== "CanceledError") {
+          state.error = action.payload;
+        }
       })
       //fetchPopularVideos
       .addCase(fetchPopularVideos.pending, (state) => {
@@ -106,10 +119,12 @@ const searchSlice = createSlice({
       })
       .addCase(fetchPopularVideos.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload;
+        if (action.error.name !== "CanceledError") {
+          state.error = action.payload;
+        }
       });
   },
 });
 
-export const { addInputValue } = searchSlice.actions;
+export const { addInputValue, resetInputToZero } = searchSlice.actions;
 export default searchSlice.reducer;

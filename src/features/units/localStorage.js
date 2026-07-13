@@ -3,10 +3,9 @@ const getQueriesKey = (email) => {
   return `user_${email.toLowerCase().trim()}`;
 };
 
-//сохраненные запросы
 export const loadSavedQueries = (email) => {
   try {
-    const key = getQueriesKey(email); //user_
+    const key = getQueriesKey(email);
     const saved = localStorage.getItem(key);
     return saved ? JSON.parse(saved) : [];
   } catch (error) {

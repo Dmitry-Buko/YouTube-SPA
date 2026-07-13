@@ -1,33 +1,47 @@
 import { Navigate, Route, Routes } from "react-router-dom";
-import Login from "../pages/Login";
-import Register from "../pages/Register";
-import Layout from "../video/Layout";
-import SearchPage from "../video/SearchPage";
-import FavoritesPage from "../video/FavoritesPage";
+import { lazy, Suspense } from "react";
 import PrivateRouter from "../features/auth/PrivateRouter";
-// import TestApi from "../assets/TestApi";
+import Layout from "../pages/Layout";
+const Login = lazy(() => import("../pages/Login"));
+const Register = lazy(() => import("../pages/Register"));
+const SearchPage = lazy(() => import("../video/SearchPage"));
+const FavoritesPage = lazy(() => import("../video/FavoritesPage"));
+
+
 
 function App() {
   return (
     <div className="container">
       <Routes>
-      {/* Публичные маршруты */}
-      <Route index element={<Navigate to="/register" replace />} />
-      <Route path="/register" element={<Register />} />
-      <Route path="/login" element={<Login />} />
+        <Route index element={<Navigate to="/register" replace />} />
+        <Route path="/register" element={
+          <Suspense fallback={<div className="loading">Загрузка страницы регистрации...</div>}>
+            <Register />
+          </Suspense>
+        } />
+        <Route path="/login" element={
+          <Suspense fallback={<div className="loading">Загрузка страницы входа...</div>}>
+            <Login />
+          </Suspense>
+        } />
 
-      {/* Защищенные маршруты с вашим PrivateRouter */}
-      <Route element={<PrivateRouter />}>
-        <Route element={<Layout />}>
-          <Route path="/search" element={<SearchPage />} />
-          <Route path="/favorites" element={<FavoritesPage />} />
+        <Route element={<PrivateRouter />}>
+          <Route element={<Layout />}>
+            <Route path="/search" element={
+              <Suspense fallback={<div className="loading">Загрузка поиска...</div>}>
+                <SearchPage />
+              </Suspense>
+            } />
+            <Route path="/favorites" element={
+              <Suspense fallback={<div className="loading">Загрузка избранного...</div>}>
+                <FavoritesPage />
+              </Suspense>
+            } />
+          </Route>
         </Route>
-      </Route>
 
-      {/* 404 / Редирект */}
-      <Route path="*" element={<Navigate to="/register" replace />} />
-    </Routes>
-      {/* <TestApi/> */}
+        <Route path="*" element={<Navigate to="/register" replace />} />
+      </Routes>
     </div>
   );
 }

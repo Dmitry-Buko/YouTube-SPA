@@ -1,4 +1,3 @@
-// utils/mapYouTubeVideo.js
 export const mapYouTubeVideo = (video) => {
   const snippet = video.snippet || {};
   const statistics = video.statistics || {};

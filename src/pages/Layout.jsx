@@ -1,15 +1,20 @@
 import { Outlet, Link, useNavigate } from "react-router-dom";
-import { logout } from "../features/auth/authSlice";
+import { resetDataToZero } from "../features/auth/authSlice";
 import { useDispatch } from "react-redux";
 import { AppBar, Toolbar, Box, IconButton, Typography } from "@mui/material";
 import LetterAvatars from "../shared/ui/mui_components/Avatar";
 import LogoutIcon from "@mui/icons-material/Logout";
+import { resetInputToZero } from "../video/store/searchSlice";
 
 const Layout = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  
   const handleLogout = () => {
-    dispatch(logout());
+    localStorage.removeItem("token");
+    localStorage.removeItem("userEmail");
+    dispatch(resetDataToZero());
+    dispatch(resetInputToZero());
     navigate("/login", { replace: true });
   };
   return (
@@ -39,7 +44,7 @@ const Layout = () => {
         </Toolbar>
       </AppBar>
 
-      <Box component="main" sx={{ bgcolor: "#0a0a0a", minHeight: "calc(100vh - 64px)" }}>
+      <Box component="main" sx={{ bgcolor: "#0f0f0f", minHeight: "calc(100vh - 64px)" }}>
         <Outlet />
       </Box>
     </>

@@ -3,7 +3,6 @@ import "../shared/styles/VideoCard.css";
 
 function VideoCardSkeleton({ variant = "grid" }) {
   const isList = variant === "list";
-
   return (
     <div
       className={`video-card ${isList ? "video-card--list" : "video-card--grid"}`}

@@ -11,7 +11,6 @@ const initialState = {
   error: null,
 };
 
-//сохраненные запросы
 export const loadQueries = createAsyncThunk(
   "savedQueries/loadQueries",
   async () => {

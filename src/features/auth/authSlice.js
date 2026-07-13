@@ -15,21 +15,28 @@ const initialState = {
 
 export const newUserRegistration = createAsyncThunk(
   "auth/newUserRegistration",
-  async (formData, { rejectWithValue }) => {
+  async (formData, thunkAPI) => {
     const url = "https://todo-redev.onrender.com/api/auth/register";
     const config = {
       headers: {
         Accept: "application/json",
         "Content-Type": "application/json",
       },
+      signal: thunkAPI.signal,
     };
+    
     try {
       const response = await axios.post(url, formData, config);
       const token = response.data?.access_token;
       localStorage.setItem("token", token);
       setCurrentUserEmail(formData.email);
+      return response.data;
     } catch (error) {
-      return rejectWithValue(
+      if (error.code === "ERR_CANCELED") {
+        console.error("Запрос отменен auth/newUserRegistration");
+        return thunkAPI.rejectWithValue("Запрос отменен"); 
+      }
+      return thunkAPI.rejectWithValue(
         error?.response?.data?.errors?.[0]?.msg ||
           error?.response?.data?.message ||
           "Ошибка запроса /fetchUserData",
@@ -40,26 +47,33 @@ export const newUserRegistration = createAsyncThunk(
 
 export const loginUser = createAsyncThunk(
   "auth/loginUser",
-  async (_, thunkApi) => {
+  async (_, thunkAPI) => {
     const url = "https://todo-redev.onrender.com/api/auth/login";
     const config = {
       headers: {
         Accept: "application/json",
         "Content-Type": "application/json",
       },
+      signal: thunkAPI.signal,
     };
-    const { email, password } = thunkApi.getState().auth;
+
+    const { email, password } = thunkAPI.getState().auth;
     const formData = { email, password };
+
     try {
       const response = await axios.post(url, formData, config);
-      const token = response.data.access_token;
+      const token = response.data?.access_token;
       localStorage.setItem("token", token);
       setCurrentUserEmail(email);
     } catch (error) {
-      return thunkApi.rejectWithValue(
+      if (error.code === "ERR_CANCELED") {
+        console.error("Запрос отменен auth/loginUser");
+        return thunkAPI.rejectWithValue("Запрос отменен"); 
+      }
+      return thunkAPI.rejectWithValue(
         error?.response?.data?.errors?.[0]?.msg ||
           error?.response?.data?.message ||
-          "Ошибка запроса /fetchUserData",
+          "Ошибка запроса auth/loginUser",
       );
     }
   },
@@ -113,5 +127,5 @@ const authSlice = createSlice({
   },
 });
 
-export const { setFormData } = authSlice.actions;
+export const { setFormData, resetDataToZero } = authSlice.actions;
 export default authSlice.reducer;
